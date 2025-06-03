@@ -10,22 +10,23 @@ class LoginOrRegister extends StatefulWidget {
 }
 
 class _LoginOrRegisterState extends State<LoginOrRegister> {
-  bool ShaowLoinPage = true;
+  bool showLoginPage = true;
 
   void toggleLoginPage() {
+    print("toggleLoginPage called! Current showLoginPage: $showLoginPage");
     setState(() {
-      ShaowLoinPage = !ShaowLoinPage;
+      showLoginPage = !showLoginPage;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (ShaowLoinPage) {
+    if (showLoginPage) {
       return LoginPage(
         onTap: toggleLoginPage,
       );
     } else {
-      return Register_Page(
+      return RegisterPage(
         onTap: toggleLoginPage,
       );
     }

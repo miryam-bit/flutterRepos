@@ -1,6 +1,6 @@
 import 'package:delivery_app/components/my_quantity_selector_.dart';
-import 'package:delivery_app/models/cart_item.dart';
-import 'package:delivery_app/models/restaurent.dart';
+// Corrected import: Use the barrel file for all models
+import 'package:delivery_app/models/models.dart'; 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,7 +27,7 @@ class MyCartTail extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.asset(
-                      cartItem.food.ImgaePath,
+                      cartItem.food.imagePath,
                       height: 70,
                       width: 70,
                     ),

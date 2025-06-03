@@ -3,235 +3,154 @@ import 'package:delivery_app/models/cart_item.dart';
 import 'package:delivery_app/models/food.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Restaurant extends ChangeNotifier {
-  final List<Food> _menu = [
-    //Burger
-    Food(
-        name: "Chees Burger",
-        description:
-            "Waa Burger Saaid Umacaan Waxoo Ka Kowan Yahay Bardho iyo Burger iyo Chees Badan",
-        ImgaePath: "lib/images/burgers/burger-1.png",
-        price: 1.99,
-        category: FoodCategory.Burgers,
-        avaliableAddons: [
-          Addon(name: "Baedho Dheraad", price: 0.99),
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
-    Food(
-        name: "Beef Burger",
-        description:
-            "Waa Heleb Burger Saaid Umacaan Waxoo Ka Kowan Yahay Bardho iyo Burger iyo Heleb ",
-        ImgaePath: "lib/images/burgers/burger-2.webp",
-        price: 2.99,
-        category: FoodCategory.Burgers,
-        avaliableAddons: [
-          Addon(name: "Baedho Busbas Dheraad", price: 0.99),
-          Addon(name: "Ukun Dheraad", price: 0.99),
-        ]),
-    Food(
-        name: "Chiaken Burger",
-        description:
-            "Waa Burger Saaid Umacaan Waxoo Ka Kowan Yahay Bardho iyo Dooro iyo Chees Badan",
-        ImgaePath: "lib/images/burgers/burger-4.png",
-        price: 1.99,
-        category: FoodCategory.Burgers,
-        avaliableAddons: [
-          Addon(name: "Ukun Dheraad", price: 0.99),
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
-    Food(
-        name: "Spical Burger",
-        description:
-            "Waa Burger Saaid Umacaan Waxoo Ka Kowan Yahay Bardho iyo Burger iyo Chees Badan",
-        ImgaePath: "lib/images/burgers/burger-5.png",
-        price: 3.99,
-        category: FoodCategory.Burgers,
-        avaliableAddons: [
-          Addon(name: "Baedho Dheraad", price: 0.99),
-          Addon(name: "Spical-Addon Dheraad", price: 1.99),
-        ]),
+  List<Food> _menu = [];
 
-    //Salad
-    Food(
-        name: "Chiken Salad",
-        description: "Waa Salad iyo Chiken Farsh ah Oo Saaid Umacaan ",
-        ImgaePath: "lib/images/salads/salad2.png",
-        price: 1.99,
-        category: FoodCategory.Salads,
-        avaliableAddons: [
-          Addon(name: "Baedho Dheraad", price: 0.99),
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
-    Food(
-        name: "Chees Salad",
-        description: "Waa Salad iyo Chees Farsh ah Oo Saaid Umacaan ",
-        ImgaePath: "lib/images/salads/salad5.png",
-        price: 0.99,
-        category: FoodCategory.Salads,
-        avaliableAddons: [
-          Addon(name: "Baedho Busbas Dheraad", price: 0.99),
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
-    Food(
-        name: "Vegetable Salad",
-        description: "Waa Salad iyo Qudar Farsh ah Oo Saaid Umacaan ",
-        ImgaePath: "lib/images/salads/salad3.png",
-        price: 2.99,
-        category: FoodCategory.Salads,
-        avaliableAddons: [
-          Addon(name: "Baedho Dheraad", price: 0.99),
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
-    Food(
-        name: "Salad",
-        description: "Waa Salad Farsh ah Oo Saaid Umacaan ",
-        ImgaePath: "lib/images/salads/salad4.png",
-        price: 1.00,
-        category: FoodCategory.Salads,
-        avaliableAddons: [
-          Addon(name: "Ukun Dheraad", price: 0.99),
-          Addon(name: "Spical.Addon Dheraad", price: 1.00),
-        ]),
+  final String _apiUrl = "http://192.168.1.107:8000/api/foods";
 
-    //Desserts
-    Food(
-        name: "Ice Cream",
-        description: "Waa Ice Cream Farsh ah Oo Saaid Umacaan ",
-        ImgaePath: "lib/images/desserts/Desserts-1.png",
-        price: 1.00,
-        category: FoodCategory.Desserts,
-        avaliableAddons: [
-          Addon(name: "Baedho Dheraad", price: 0.99),
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
-    Food(
-        name: "Cup Cake",
-        description: "Waa Ice Cream Farsh ah Oo Saaid Umacaan ",
-        ImgaePath: "lib/images/desserts/Desserts-2.png",
-        price: 0.99,
-        category: FoodCategory.Desserts,
-        avaliableAddons: [
-          Addon(name: "Baedho Dheraad", price: 0.99),
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
-    Food(
-        name: "Chocolate Cake",
-        description: "Waa Ice Cream Farsh ah Oo Saaid Umacaan ",
-        ImgaePath: "lib/images/desserts/Desserts-3.png",
-        price: 2.59,
-        category: FoodCategory.Desserts,
-        avaliableAddons: [
-          Addon(name: "Baedho Dheraad", price: 0.99),
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
-    Food(
-        name: "Donats",
-        description: "Waa Ice Cream Farsh ah Oo Saaid Umacaan ",
-        ImgaePath: "lib/images/desserts/Desserts-4.png",
-        price: 1.50,
-        category: FoodCategory.Desserts,
-        avaliableAddons: [
-          Addon(name: "Baedho Dheraad", price: 0.99),
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
-    //Drinks
-    Food(
-        name: "Coca Cola",
-        description: "Waa Cabitan Strowberry Farsh ah Oo Saaid Umacaan ",
-        ImgaePath: "lib/images/drinks/Drink-1.png",
-        price: 1.00,
-        category: FoodCategory.Drinks,
-        avaliableAddons: [
-          Addon(name: "Baedho Dheraad", price: 0.99),
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
-    Food(
-        name: "Ice Coffee",
-        description: "Waa Ice Coffee Farsh ah Oo Saaid Umacaan ",
-        ImgaePath: "lib/images/drinks/Drink-4.png",
-        price: 1.00,
-        category: FoodCategory.Drinks,
-        avaliableAddons: [
-          Addon(name: "Baedho Dheraad", price: 0.99),
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
-    Food(
-        name: "Orange Juce ",
-        description: "Waa Ice Cream Farsh ah Oo Saaid Umacaan ",
-        ImgaePath: "lib/images/drinks/Drink-3.png",
-        price: 1.00,
-        category: FoodCategory.Drinks,
-        avaliableAddons: [
-          Addon(name: "Baedho Dheraad", price: 0.99),
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
-    Food(
-        name: "Lemon",
-        description: "Waa Coca Cola Farsh ah Oo Saaid Umacaan ",
-        ImgaePath: "lib/images/drinks/Drink-2.png",
-        price: 1.00,
-        category: FoodCategory.Drinks,
-        avaliableAddons: [
-          Addon(name: "Baedho Dheraad", price: 0.99),
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
+  String _deliveryAddress = '99 Hollywood Bvd';
+  
+  String get deliveryAddress => _deliveryAddress;
 
-    //sides
-    Food(
-        name: "Spical-min",
-        description: "Waa Bardho saaid Umac Oo Farsh ah Oo Saaid Umacaan ",
-        ImgaePath: "lib/images/sides/Side-1.jpg",
-        price: 1.00,
-        category: FoodCategory.Sides,
-        avaliableAddons: [
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
-    Food(
-        name: "Fries",
-        description: "Waa Bardho saaid Umac Oo Farsh ah Oo Saaid Umacaan ",
-        ImgaePath: "lib/images/sides/Side-3.jpg",
-        price: 1.00,
-        category: FoodCategory.Sides,
-        avaliableAddons: [
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
-    Food(
-        name: "Spical-full",
-        description: "Waa Ukun saaid Umac Oo Farsh ah Oo Saaid Umacaan ",
-        ImgaePath: "lib/images/sides/Side-4.jpg",
-        price: 1.00,
-        category: FoodCategory.Sides,
-        avaliableAddons: [
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
-    Food(
-        name: "Ukun",
-        description: "Waa Karoto saaid Umac Oo Farsh ah Oo Saaid Umacaan ",
-        ImgaePath: "lib/images/sides/Side-5.jpg",
-        price: 1.00,
-        category: FoodCategory.Sides,
-        avaliableAddons: [
-          Addon(name: "Chees Dheraad", price: 0.5),
-        ]),
-  ];
-
-  //Gatter
   List<Food> get menu => _menu;
+
+  final List<CartItem> _cart = [];
   List<CartItem> get cart => _cart;
 
-  //shaqada mesha aan ka qabtay sid add cart iyo wixii laxariiro
-  final List<CartItem> _cart = [];
+  final List<String> _orderHistory = [];
+  List<String> get orderHistory => _orderHistory.reversed.toList();
 
-  //add to cart
+  bool _isLoading = true;
+  String? _error;
+
+  bool _isPlacingOrder = false;
+  String? _placeOrderError;
+
+  bool get isLoading => _isLoading;
+  String? get error => _error;
+  bool get isPlacingOrder => _isPlacingOrder;
+  String? get placeOrderError => _placeOrderError;
+
+  String get _baseApiUrl {
+    if (_apiUrl.endsWith("/foods")) {
+      return _apiUrl.substring(0, _apiUrl.length - "/foods".length);
+    }
+    return _apiUrl;
+  }
+
+  Future<void> fetchMenu(String? token) async {
+    _isLoading = true;
+    _error = null;
+    if (token == null) {
+        _error = "Authentication token not found. Please log in.";
+        _isLoading = false;
+        notifyListeners();
+        return;
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse(_apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        _menu = data.map((json) => Food.fromJson(json)).toList();
+      } else if (response.statusCode == 401) {
+        _error = "Unauthorized. Please log in again.";
+        _menu = [];
+      } else {
+        _error = "Failed to load menu. Status code: ${response.statusCode}";
+        _menu = [];
+      }
+    } catch (e) {
+      _error = "Failed to load menu. Error: $e";
+      _menu = [];
+    }
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<Map<String, dynamic>> placeOrder(
+      {required String token,
+      required String deliveryAddress,
+      double deliveryFee = 0.0,
+      String? notes}) async {
+    _isPlacingOrder = true;
+    _placeOrderError = null;
+    notifyListeners();
+
+    if (_cart.isEmpty) {
+      _isPlacingOrder = false;
+      _placeOrderError = "Cart is empty. Please add items to your cart.";
+      notifyListeners();
+      return {'success': false, 'message': _placeOrderError};
+    }
+
+    List<Map<String, dynamic>> itemsPayload = _cart.map((cartItem) {
+      return {
+        'food_id': cartItem.food.id,
+        'quantity': cartItem.quantity,
+        'addons_details': cartItem.selectedAddons.map((addon) => {
+          'name': addon.name,
+          'price': addon.price,
+        }).toList(),
+      };
+    }).toList();
+
+    Map<String, dynamic> body = {
+      'delivery_address': deliveryAddress,
+      'items': itemsPayload,
+      'delivery_fee': deliveryFee,
+    };
+    if (notes != null && notes.isNotEmpty) {
+      body['notes'] = notes;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseApiUrl/orders'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(body),
+      );
+
+      _isPlacingOrder = false;
+      final responseBody = jsonDecode(response.body);
+
+      if (response.statusCode == 201) {
+        clearCart();
+        notifyListeners();
+        return {'success': true, 'order': responseBody};
+      } else {
+        _placeOrderError = "Failed to place order: ${responseBody['message'] ?? response.reasonPhrase}";
+        notifyListeners();
+        return {'success': false, 'message': _placeOrderError};
+      }
+    } catch (e) {
+      _isPlacingOrder = false;
+      _placeOrderError = "Failed to place order. Error: $e";
+      notifyListeners();
+      return {'success': false, 'message': _placeOrderError};
+    }
+  }
+
   void addToCart(Food food, List<Addon> selectedAddons) {
-    CartItem? cartItem = _cart.firstWhereOrNull((Item) {
-      //check if the food items are the same
-      bool isSameFood = Item.food == food;
-
-      //check if the addons are the same
+    CartItem? cartItem = _cart.firstWhereOrNull((item) {
+      bool isSameFood = item.food == food;
       bool isSameAddons =
-          ListEquality().equals(Item.selectedAddons, selectedAddons);
+          ListEquality().equals(item.selectedAddons, selectedAddons);
       return isSameFood && isSameAddons;
     });
 
@@ -248,92 +167,92 @@ class Restaurant extends ChangeNotifier {
     notifyListeners();
   }
 
-  //remove from cart
   void removeFromCart(CartItem cartItem) {
     int cartIndex = _cart.indexOf(cartItem);
-
     if (cartIndex != -1) {
       if (_cart[cartIndex].quantity > 1) {
         _cart[cartIndex].quantity--;
       } else {
         _cart.removeAt(cartIndex);
       }
-      notifyListeners();
     }
+    notifyListeners();
   }
 
-  //get total price of cart
   double getTotalPrice() {
     double total = 0.0;
-
     for (CartItem cartItem in _cart) {
       double itemTotal = cartItem.food.price;
-
       for (Addon addon in cartItem.selectedAddons) {
         itemTotal += addon.price;
       }
-
       total += itemTotal * cartItem.quantity;
     }
     return total;
   }
 
-  //get total number of items in cart
-  int getTotalQuantity() {
-    int total = 0;
-
+  int getTotalItemCount() {
+    int totalItemCount = 0;
     for (CartItem cartItem in _cart) {
-      total += cartItem.quantity;
+      totalItemCount += cartItem.quantity;
     }
-    return total;
+    return totalItemCount;
   }
 
-  //clear cart
   void clearCart() {
     _cart.clear();
     notifyListeners();
   }
 
-  // generate a receipt
   String displayCartReceipt() {
     final receipt = StringBuffer();
     receipt.writeln("Here is your receipt.");
     receipt.writeln();
 
-    //format the data to include up to seconds only
     String formattedDate =
         DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+
     receipt.writeln(formattedDate);
     receipt.writeln();
-    receipt.writeln("--------------------");
+    receipt.writeln("----------");
 
-    for (final CartItem in _cart) {
+    for (final cartItem in _cart) {
       receipt.writeln(
-          "${CartItem.quantity} x ${CartItem.food.name} - ${_formatPrice(CartItem.food.price)}");
-      if (CartItem.selectedAddons.isNotEmpty) {
+          "${cartItem.quantity} x ${cartItem.food.name} - ${_formatPrice(cartItem.food.price)}");
+      if (cartItem.selectedAddons.isNotEmpty) {
         receipt
-            .writeln("   Add-ons: ${_formatAddons(CartItem.selectedAddons)}");
+            .writeln("   Add-ons: ${_formatAddons(cartItem.selectedAddons)}");
       }
       receipt.writeln();
     }
-
-    receipt.writeln("--------------------");
+    receipt.writeln("----------");
     receipt.writeln();
-    receipt.writeln("Total Items: ${getTotalQuantity()}");
+    receipt.writeln("Total Items: ${getTotalItemCount()}");
     receipt.writeln("Total Price: ${_formatPrice(getTotalPrice())}");
+    receipt.writeln();
+    receipt.writeln("Delivering to: $deliveryAddress");
 
     return receipt.toString();
   }
 
-  //from double value into Money
   String _formatPrice(double price) {
     return "\$${price.toStringAsFixed(2)}";
   }
 
-  //format list of addons into a string summary
   String _formatAddons(List<Addon> addons) {
     return addons
         .map((addon) => "${addon.name} (${_formatPrice(addon.price)})")
         .join(", ");
+  }
+
+  void updateDeliveryAddress(String newAddress) {
+    _deliveryAddress = newAddress;
+    notifyListeners();
+  }
+
+  void recordOrder() {
+    final String receipt = displayCartReceipt();
+    _orderHistory.add(receipt);
+    notifyListeners();
   }
 }

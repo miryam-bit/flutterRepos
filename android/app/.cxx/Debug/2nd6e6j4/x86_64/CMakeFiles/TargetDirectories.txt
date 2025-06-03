@@ -1,0 +1,2 @@
+C:/Users/Me/Desktop/delivery-app/Simple_flutter_foodDelivery/android/app/.cxx/Debug/2nd6e6j4/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/Me/Desktop/delivery-app/Simple_flutter_foodDelivery/android/app/.cxx/Debug/2nd6e6j4/x86_64/CMakeFiles/rebuild_cache.dir

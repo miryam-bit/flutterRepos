@@ -2,6 +2,8 @@ import 'package:delivery_app/components/my_button.dart';
 import 'package:delivery_app/components/my_testfild.dart';
 import 'package:delivery_app/pages/Home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:delivery_app/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
@@ -15,12 +17,50 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController controller = TextEditingController();
   final TextEditingController password = TextEditingController();
 
-  void login() {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomePage(),
-        ));
+  void login() async {
+    print("Login button (login_page.dart) pressed!");
+    final authService = Provider.of<AuthService>(context, listen: false);
+
+    try {
+      Map<String, dynamic> result = await authService.login(
+        controller.text,
+        password.text,
+      );
+
+      if (result['success']) {
+        // Navigate to home page
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        // Show error message
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Login Failed'),
+            content: Text(result['message'] ?? 'Invalid credentials or an error occurred.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Login Error'),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override

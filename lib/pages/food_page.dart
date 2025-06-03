@@ -1,6 +1,7 @@
 import 'package:delivery_app/components/my_button.dart';
-import 'package:delivery_app/models/food.dart';
-import 'package:delivery_app/models/restaurent.dart';
+// Corrected import: Use the barrel file for all models
+import 'package:delivery_app/models/models.dart';
+import 'package:delivery_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +21,7 @@ class FoodPage extends StatefulWidget {
 
 class _FoodPageState extends State<FoodPage> {
   //method to add to cart
-  void addToCart(Food food, Map<Addon, bool> currentlySelectedAddons) {
+  void addToCart(Food food) {
     //close the current page
     Navigator.pop(context);
 
@@ -45,7 +46,50 @@ class _FoodPageState extends State<FoodPage> {
           body: SingleChildScrollView(
             child: Column(
               children: [
-                Image.asset(widget.food.ImgaePath),
+                Builder(
+                  builder: (context) {
+                    String imageUrl = '';
+                    if (widget.food.imagePath.isNotEmpty) {
+                      final authService = Provider.of<AuthService>(context, listen: false);
+                      if (Uri.tryParse(widget.food.imagePath)?.isAbsolute ?? false) {
+                        imageUrl = widget.food.imagePath;
+                      } else {
+                        imageUrl = "${authService.baseUrl.replaceAll("/api", "")}/storage/${widget.food.imagePath}";
+                      }
+                      return Image.network(
+                        imageUrl,
+                        height: 250,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          print("Error loading network image for food page: $imageUrl, Error: $error");
+                          return Image.asset(
+                            widget.food.imagePath,
+                            height: 250,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              print("Error loading asset image for food page: ${widget.food.imagePath}, Error: $error");
+                              return Container(
+                                height: 250,
+                                width: double.infinity,
+                                color: Colors.grey[300],
+                                child: Icon(Icons.broken_image, size: 100, color: Theme.of(context).colorScheme.error),
+                              );
+                            },
+                          );
+                        },
+                      );
+                    } else {
+                      return Container(
+                        height: 250,
+                        width: double.infinity,
+                        color: Colors.grey[300],
+                        child: Icon(Icons.fastfood, size: 100, color: Theme.of(context).colorScheme.primary),
+                      );
+                    }
+                  }
+                ),
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
@@ -129,7 +173,7 @@ class _FoodPageState extends State<FoodPage> {
                 ),
                 //button => add to the cart
                 MyButton(
-                  onTap: () => addToCart(widget.food, widget.selectedAddons),
+                  onTap: () => addToCart(widget.food),
                   text: "Add to Cart",
                 ),
                 SizedBox(

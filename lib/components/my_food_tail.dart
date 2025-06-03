@@ -1,5 +1,7 @@
-import 'package:delivery_app/models/food.dart';
+import 'package:delivery_app/models/models.dart';
+import 'package:delivery_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class MyFoodTail extends StatelessWidget {
   final Food food;
@@ -45,9 +47,49 @@ class MyFoodTail extends StatelessWidget {
                 //food image
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
-                    food.ImgaePath,
-                    height: 120,
+                  child: Builder(
+                    builder: (context) {
+                      String imageUrl = '';
+                      if (food.imagePath.isNotEmpty) {
+                        final authService = Provider.of<AuthService>(context, listen: false);
+                        if (Uri.tryParse(food.imagePath)?.isAbsolute ?? false) {
+                          imageUrl = food.imagePath;
+                        } else {
+                          imageUrl = "${authService.baseUrl.replaceAll("/api", "")}/storage/${food.imagePath}";
+                        }
+                        return Image.network(
+                          imageUrl,
+                          height: 120,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            print("Error loading network image for food tile: $imageUrl, Error: $error");
+                            // Attempt to load as asset as a fallback
+                            return Image.asset(
+                              food.imagePath, // Original path
+                              height: 120,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                print("Error loading asset image for food tile: ${food.imagePath}, Error: $error");
+                                return Container(
+                                  height: 120,
+                                  width: 120, // Assuming similar width for placeholder
+                                  color: Colors.grey[300],
+                                  child: Icon(Icons.broken_image, size: 40, color: Theme.of(context).colorScheme.error),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      } else {
+                        // Placeholder if imagePath is empty
+                        return Container(
+                          height: 120,
+                          width: 120,
+                          color: Colors.grey[300],
+                          child: Icon(Icons.fastfood, size: 40, color: Theme.of(context).colorScheme.primary),
+                        );
+                      }
+                    },
                   ),
                 )
               ],

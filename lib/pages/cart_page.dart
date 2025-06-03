@@ -1,6 +1,6 @@
 import 'package:delivery_app/components/my_button.dart';
 import 'package:delivery_app/components/my_cart_tail.dart';
-import 'package:delivery_app/models/restaurent.dart';
+import 'package:delivery_app/models/models.dart';
 import 'package:delivery_app/pages/payment_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,7 +27,7 @@ class CartPage extends StatelessWidget {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text('Are you sure you went to clear the cart?'),
+                      title: Text('Are you sure you want to clear the cart?'),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context),
@@ -76,6 +76,19 @@ class CartPage extends StatelessWidget {
                           ),
                         ),
                 ],
+              ),
+            ),
+
+            // Display Total Price
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Total Price: \$${restaurant.getTotalPrice().toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                ),
               ),
             ),
 

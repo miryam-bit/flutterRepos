@@ -1,7 +1,10 @@
 import 'package:delivery_app/components/my_button.dart';
-import 'package:delivery_app/pages/delivary_progress_page.dart';
+import 'package:delivery_app/pages/delivery_progress_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
+import 'package:provider/provider.dart';
+import 'package:delivery_app/models/models.dart';
+import 'package:delivery_app/services/auth_service.dart';
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -18,37 +21,76 @@ class _PaymentPageState extends State<PaymentPage> {
   String cvvCode = '';
   bool isCvvFocused = false;
 
-  void userTappedPay() {
+  Future<void> userTappedPay() async {
     if (formKey.currentState!.validate()) {
+      final restaurant = context.read<Restaurant>();
+      final authService = context.read<AuthService>();
+
+      if (authService.token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Authentication error. Please log in again.')),
+        );
+        return;
+      }
+
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: Text("Confirm payment"),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: [
-                Text("Card Number $cardNumber"),
-                Text("Expiry Date $expiryDate"),
-                Text("Card Holder Name $cardHolderName"),
-                Text("CVV Code $cvvCode"),
-              ],
-            ),
+        barrierDismissible: false,
+        builder: (context) => const PopScope(
+          canPop: false,
+          child: AlertDialog(
+            title: Text("Processing Order..."),
+            content: Center(child: CircularProgressIndicator()),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DelivaryProgressPage()),
-              ),
-              child: Text('Yes'),
-            ),
-          ],
-        ),
+        )
       );
+
+      try {
+        final result = await restaurant.placeOrder(
+          token: authService.token!,
+          deliveryAddress: restaurant.deliveryAddress,
+          deliveryFee: 0.0,
+          notes: null,
+        );
+
+        Navigator.of(context).pop();
+
+        if (result['success'] == true) {
+          final String mockReceiptForDisplay = restaurant.displayCartReceipt();
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Scaffold(
+                appBar: AppBar(title: Text("Order Confirmed")),
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green, size: 100),
+                      SizedBox(height: 20),
+                      Text("Your order has been placed successfully!"),
+                      SizedBox(height: 20),
+                      MyButton(text: "Back to Home", onTap: () {
+                        Navigator.of(context).popUntil((route) => route.isFirst);
+                      })
+                    ],
+                  )
+                ),
+              )
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Order failed: ${result['message'] ?? 'Unknown error'}')),
+          );
+        }
+      } catch (e) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An unexpected error occurred: $e')),
+        );
+      }
     }
   }
 
@@ -62,7 +104,6 @@ class _PaymentPageState extends State<PaymentPage> {
       ),
       body: Column(
         children: [
-          //cerdit card
           CreditCardWidget(
             cardNumber: cardNumber,
             expiryDate: expiryDate,
@@ -71,32 +112,37 @@ class _PaymentPageState extends State<PaymentPage> {
             showBackView: isCvvFocused,
             onCreditCardWidgetChange: (p0) {},
           ),
-          CreditCardForm(
-            cardNumber: cardNumber,
-            expiryDate: expiryDate,
-            cardHolderName: cardHolderName,
-            cvvCode: cvvCode,
-            onCreditCardModelChange: (data) {
-              setState(() {
-                cardNumber = data.cardNumber;
-                expiryDate = data.expiryDate;
-                cardHolderName = data.cardHolderName;
-                cvvCode = data.cvvCode;
-                isCvvFocused = data.isCvvFocused;
-              });
-            },
-            formKey: formKey,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  CreditCardForm(
+                    cardNumber: cardNumber,
+                    expiryDate: expiryDate,
+                    cardHolderName: cardHolderName,
+                    cvvCode: cvvCode,
+                    onCreditCardModelChange: (data) {
+                      setState(() {
+                        cardNumber = data.cardNumber;
+                        expiryDate = data.expiryDate;
+                        cardHolderName = data.cardHolderName;
+                        cvvCode = data.cvvCode;
+                        isCvvFocused = data.isCvvFocused;
+                      });
+                    },
+                    formKey: formKey,
+                  ),
+                  MyButton(
+                    onTap: userTappedPay,
+                    text: 'Pay Now!',
+                  ),
+                  SizedBox(
+                    height: 20,
+                  )
+                ],
+              ),
+            ),
           ),
-
-          const Spacer(),
-
-          MyButton(
-            onTap: userTappedPay,
-            text: 'Pay Now!',
-          ),
-          SizedBox(
-            height: 20,
-          )
         ],
       ),
     );
